@@ -56,3 +56,6 @@ positions_of_class
 
 .project
 .cproject
+*.DS_Store
+sample/output
+

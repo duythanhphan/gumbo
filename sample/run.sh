@@ -1,15 +1,24 @@
 #!/bin/sh
 
-TEMPLATE_LINK=https://www.freelancer.com/jobs/PHP/XXX/index.html
+DIR=output
+ITEM=IPAD
+ITEM_PATH=${DIR}/${ITEM}
 
-# get first index.html
-rm -rf index.html
-FIRST_LINK=https://www.freelancer.com/jobs/PHP/1/index.html
+TEMPLATE_LINK=https://www.freelancer.com/jobs/${ITEM}/XXX/index.html
+
+# get first index.htmal
+if [ -d "${ITEM_PATH}" ]; then
+	rm -rf ${ITEM_PATH}/*;
+else
+	mkdir ${ITEM_PATH};
+fi
+
+FIRST_LINK=https://www.freelancer.com/jobs/${ITEM}/1/index.html
 echo "Downloading ${FIRST_LINK}";
-wget -O index.html ${FIRST_LINK} >& /dev/null;
+wget -O ${ITEM_PATH}/index.html ${FIRST_LINK} >& /dev/null;
 
 # get entries info
-ENTRIES_INFO=`get_entries index.html`
+ENTRIES_INFO=`get_entries ${ITEM_PATH}/index.html`
 
 START_ENTRY=`echo ${ENTRIES_INFO} | awk -F\  '{ print $2}'`
 END_ENTRY=`echo ${ENTRIES_INFO} | awk -F\  '{ print $4}'`
@@ -28,14 +37,14 @@ echo "ALL:   ${ALL_ENTRIES}"
 echo "STEP:  ${ALL_PAGES}"
 echo "=========================="
 
-find_links index.html | grep "www.freelancer.com/projects";
+find_links ${ITEM_PATH}/index.html | grep "www.freelancer.com/projects";
 
 STEP=1
-ALL_PAGES=5
+#ALL_PAGES=5
 while [ ${STEP} -lt ${ALL_PAGES} ]; do
     STEP=$(( ${STEP} + 1 ));
     LINK=`echo ${TEMPLATE_LINK} | sed -e "s/XXX/${STEP}/g"`;
     #echo "Downloading ${LINK}";
-    wget -O index_${STEP}.html ${LINK} >& /dev/null;
-    find_links index_${STEP}.html | grep "www.freelancer.com/projects";
+    wget -O ${ITEM_PATH}/index_${STEP}.html ${LINK} >& /dev/null;
+    find_links ${ITEM_PATH}/index_${STEP}.html | grep "www.freelancer.com/projects";
 done
